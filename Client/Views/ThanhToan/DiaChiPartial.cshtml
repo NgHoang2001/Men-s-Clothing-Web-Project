@@ -1,0 +1,575 @@
+﻿@model ThanhToanParam;
+
+@{
+    var lstDiaChi = ViewData["lstDiaChi"] as List<DiaChiDatHangClientResp>;
+    var lstThanhPho = ViewData["dsThanhPho"] as List<ThanhPhoResp>;
+    var lstHuyen =new List<HuyenResp>();
+    var lstXa =new List<PhuongResp>();
+    if (lstDiaChi != null && lstDiaChi.Count > 0)
+    {
+        foreach (var item in lstDiaChi)
+        {
+            lstHuyen.AddRange(await servicesTaiKhoan.DanhSachHuyenTheoId(item.Province_code));
+            lstXa.AddRange(await servicesTaiKhoan.DanhSachXaTheoId(item.District_code));
+        }
+        lstHuyen = lstHuyen.Distinct().ToList();
+        lstXa = lstXa.Distinct().ToList();
+    }
+}
+
+<div class="border border-1 p-3 mb-5">
+    <div class="mb-3 mt-3">
+        <h4><i class="fa-solid fa-location-dot me-2"></i>Địa chỉ giao hàng</h4>
+    </div>
+    @if (lstDiaChi != null && lstDiaChi.Count > 0)
+    {
+        var item = lstDiaChi?.FirstOrDefault(x => x.IsChon);
+            <input asp-for="@Model.Id_DiaChi" value="@item?.Id" hidden />
+            <div class="row">
+                <div class="col">
+                    <span class="fw-bold">Họ và tên: </span><span class="fw-bold">@item?.TenNguoiNhan</span>
+                </div>
+                <div class="col-3">
+                    <span class="fw-bold">SĐT: </span><span class="fw-bold">@item?.Sdt</span>
+                </div>
+                @if (item != null && (bool)item.IsDefault)
+                {
+                    <div class="col-3 text-danger">
+                        <span class="">Địa chỉ mặc định</span>
+                    </div>
+                }
+                <div class="col-3 text-danger">
+                </div>
+                
+            </div>
+            <div class="row mt-2">
+                <div class=" col">
+                    <span class="fw-bold">Địa chỉ giao hàng: </span><span>
+                       @item.DiaChiChiTiet, @item.Url
+                    </span>
+                </div>
+            </div>
+            <div class="text-end d-flex justify-content-end mt-3">
+                <a href="#" class="text-decoration-underline" data-bs-toggle="modal"
+                   data-bs-target="#themMoiDiaChi">Thêm địa chỉ giao hàng</a>
+                <span class="ms-2 me-2">-</span>
+                <a href="#" class="text-decoration-underline" data-bs-toggle="modal"
+                   data-bs-target="#thayDoiDiaChi">
+                    Chọn địa chỉ giao hàng
+                </a>
+            </div>
+        
+    }
+    else
+    {
+        <div class="text-end d-flex justify-content-end mt-5">
+            <a href="#" class="text-decoration-underline" data-bs-toggle="modal"
+               data-bs-target="#themMoiDiaChi">Thêm địa chỉ giao hàng</a>
+        </div>
+    }
+</div>
+
+
+<div>
+    <div>
+        <!-- Modal thêm mới địa chỉ-->
+        <!-- The Modal -->
+        <div class="modal" id="themMoiDiaChi">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <form asp-action="ThemMoiDiaChi" asp-controller="ThanhToan" class="was-validated">
+                    <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Thêm địa chỉ mới</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body ">
+                            <div>
+                                <div class="row">
+                                    <div class="mb-3 col-6">
+                                        <label for="hoVaTenDC" class="form-label fw-bold">
+                                            HỌ VÀ TÊN<span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" asp-for="@Model.DiaChiParam.TenNguoiNhan"  class="form-control" id="hoVaTenDC" placeholder="Nhập họ và tên của bạn" >
+                                    </div>
+                                    <div class="mb-3 col-6">
+                                        <label for="emailDC" class="form-label fw-bold">
+                                            EMAIL<span class="text-danger">*</span>
+                                        </label>
+                                        <input type="email" asp-for="@Model.DiaChiParam.Email"  class="form-control" id="emailDC" placeholder="Nhập email của bạn" >
+                                    </div>
+                                    <div class="mb-3 col-6">
+                                        <label for="sdtDC" class="form-label fw-bold">
+                                            SĐT<span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" asp-for="@Model.DiaChiParam.Sdt"  class="form-control" id="sdtDC"
+                                               placeholder="Nhập số điện thoại" >
+                                    </div>
+                                    <div class="col-12 row">
+                                        <div class="mb-3 col-4">
+                                            <label for="" class="form-label fw-bold">
+                                                TỈNH / THÀNH PHỐ<span class="text-danger">*</span>
+                                            </label>
+                                            <select id="ThanhPho" asp-for="@Model.DiaChiParam.ThanhPho_Code" class="form-select " aria-label="Default select example">
+                                                <option value="" selected>Chọn tỉnh / thành phố</option>
+                                                @{
+                                                    foreach (var item1 in lstThanhPho)
+                                                    {
+                                                        <option value="@item1.Code">@item1.Name</option>
+                                                    }
+
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="mb-3 col-4">
+                                            <label for="" class="form-label fw-bold">
+                                                QUẬN /
+                                                HUYỆN<span class="text-danger">*</span>
+                                            </label>
+                                           <div>
+                                                <select id="provinceSelect" asp-for="@Model.DiaChiParam.Huyen_Code" class="form-select">
+                                                    <option value="" selected>
+                                                        Chọn quận huyện
+                                                    </option>
+                                                </select>
+                                           </div>
+                                        </div>
+                                        <div class="mb-3 col-4">
+                                            <label for="" class="form-label fw-bold">
+                                                PHƯỜNG /
+                                                XÃ<span class="text-danger">*</span>
+                                            </label>
+                                            <div>
+                                                <select id="wardSelect" asp-for="@Model.DiaChiParam.Xa_Code" class="form-select">
+                                                    <option value="" selected>
+                                                        Chọn phường xã
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="mb-3 col-12">
+                                        <label for="diaChi" class="form-label fw-bold">
+                                            ĐỊA CHỈ<span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" asp-for="@Model.DiaChiParam.DiaChiChiTiet"  class="form-control" id="diaChi"
+                                               placeholder="Nhập địa chỉ của bạn" >
+                                    </div>
+                                    <div class="mb-3 col-12">
+                                        <label for="ghiChu" class="form-label fw-bold">
+                                            GHI CHÚ
+                                        </label>
+                                        <textarea type="text" asp-for="@Model.DiaChiParam.GhiChu" class="form-control" id="ghiChu"
+                                                  aria-label="With textarea"
+                                                  placeholder="Nhập ghi chú của bạn"></textarea>
+                                    </div>
+                                    <div class="mb-3 col-12">
+                                        <div class="form-check">
+                                            <input asp-for="@Model.DiaChiParam.isDefault" class="form-check-input" type="checkbox" id="defaultDC" />
+                                            <label class="form-check-label ms-2 me-2 text-dark" for="defaultDC">
+                                                Đặt làm địa chỉ mặc định
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="submit" asp-action="ThemMoiDiaChi" asp-controller="ThanhToan" class="btn btn-danger">
+                                Thêm mới địa chỉ
+                            </button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div>
+        <!-- Modal chọn địa chỉ giao hàng -->
+        <!-- The Modal -->
+        <div class="modal" id="thayDoiDiaChi">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <form asp-action="ThayDoiDiaChiChon" method="get">
+                       
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Thay đổi địa chỉ giao hàng</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body ">
+                        @if (lstDiaChi != null && lstDiaChi.Count > 0)
+                        {
+                        
+                        @foreach (var item in lstDiaChi)
+                        {
+                        <div class="mt-3">
+                            @if (item.IsChon)
+                                {
+                                    <input type="radio" asp-for="Id_DiaChi" value="@item.Id" class="btn-check" name="idDiaChi" id="diachi-@item.Id" autocomplete="off" checked>
+                                }
+                                else
+                                {
+                                    <input type="radio" asp-for="Id_DiaChi" value="@item.Id" class="btn-check" name="idDiaChi" id="diachi-@item.Id" autocomplete="off">
+                                }
+
+                                    <label for="diachi-@item.Id" class="btn d-block" style="text-align: left;">
+                                    <div class="row">
+                                        <div class="col">
+                                            <span class="fw-bold">Họ và tên: </span><span class="fw-bold">@item.TenNguoiNhan</span>
+                                        </div>
+                                        <div class="col-3">
+                                            <span class="fw-bold">SĐT: </span><span class="fw-bold">@item.Sdt</span>
+                                        </div>
+                                        @if ((bool)item.IsDefault)
+                                        {
+                                            <div class="col-3 text-danger">
+                                                <span class="">Địa chỉ mặc định</span>
+                                            </div>
+                                        }
+                                        
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class=" col">
+                                            <span class="fw-bold">Địa chỉ giao hàng: </span><span>
+                                                @item.DiaChiChiTiet, @item.Url
+                                            </span>
+                                        </div>
+                                    </div>
+                                    @* ********** *@
+                                    <div class="d-flex justify-content-end">
+                                        <div class="me-3">
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#chinhsuadiachi-@item.Id"><i class="far fa-edit me-2"></i>Chỉnh sửa</a>
+                                        </div>
+                                        <div>
+                                                <a asp-action="XoaDiaChiGiaoHang" asp-controller="ThanhToan" asp-route-id="@item.Id"><i class="far fa-trash-alt me-2"></i>Xóa</a>
+                                        </div>
+                                    </div>
+                            </label>
+                        </div>
+                            }
+                        }
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer d-block">
+                        <div class="d-flex align-content-end">
+                            <button type="button" class="btn btn-outline-danger me-4" data-bs-toggle="modal"
+                                    data-bs-target="#themMoiDiaChi">
+                                Thêm mới địa chỉ
+                            </button>
+                                <button type="submit" asp-action="ThayDoiDiaChiChon" asp-controller="ThanhToan"  class="btn btn-danger">
+                                Chọn địa chỉ
+                            </button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+            <!--  -->
+        </div>
+    </div>
+
+    <div>
+        <!-- Modal chỉnh sửa địa chỉ-->
+        <!-- The Modal -->
+        @if (lstDiaChi != null && lstDiaChi.Count > 0)
+        {
+            foreach (var item in lstDiaChi)
+            {
+                <div>
+                    <form asp-action="ChinhSuaDiaChi" asp-controller="ThanhToan" class="was-validated">
+                    <div class="modal" id="chinhsuadiachi-@item.Id">
+                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+               
+                        <div class="modal-content">
+
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                                <h4 class="modal-title">Chỉnh sửa địa chỉ</h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <!-- Modal body -->
+                            <div class="modal-body ">
+                                <div>
+                                    <div class="row">
+                                        <div class="mb-3 col-6">
+                                            <label for="hoVaTenDC-@item.Id" class="form-label fw-bold">
+                                                HỌ VÀ TÊN<span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" asp-for="@Model.DiaChiParam.TenNguoiNhan" value="@item.TenNguoiNhan" class="form-control" id="hoVaTenDC-@item.Id" placeholder="Nhập họ và tên của bạn" required>
+                                        </div>
+                                        <div class="mb-3 col-6">
+                                            <label for="emailDC-@item.Id" class="form-label fw-bold">
+                                                EMAIL<span class="text-danger">*</span>
+                                            </label>
+                                            <input type="email" asp-for="@Model.DiaChiParam.Email" value="@item.TenNguoiNhan" class="form-control" id="emailDC-@item.Id"
+                                                   placeholder="Nhập email của bạn" required>
+                                        </div>
+                                        <div class="mb-3 col-6">
+                                            <label for="sdtDC-@item.Id" class="form-label fw-bold">
+                                                SĐT<span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" asp-for="@Model.DiaChiParam.Sdt" value="@item.TenNguoiNhan" class="form-control" id="sdtDC-@item.Id"
+                                                   placeholder="Nhập số điện thoại" required>
+                                        </div>
+                                        <div class="col-12 row">
+                                            <div class="mb-3 col-4">
+                                                <label for="" class="form-label fw-bold">
+                                                    TỈNH / THÀNH PHỐ<span class="text-danger">*</span>
+                                                </label>
+                                                <select id="ThanhPho-@item.Id"  asp-for="@Model.DiaChiParam.ThanhPho_Code" class="form-select" aria-label="Default select example">
+                                                    @{
+                                                        @if (lstThanhPho == null || lstThanhPho.Count ==0)
+                                                         {
+                                                                    <option value="" selected>Chọn thành phố</option>
+                                                        }
+                                                        else
+                                                        {
+                                                                    <option value="">Chọn thành phố</option>
+                                                                    foreach (var item1 in lstThanhPho)
+                                                                    {
+                                                                        if (item1.Code == item.Province_code)
+                                                                        {
+                                                                            <option value="@item1.Code" selected>@item1.Name</option>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <option value="@item1.Code">@item1.Name</option>
+                                                                        }
+
+                                                                    }
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="mb-3 col-4">
+                                                <label for="" class="form-label fw-bold">
+                                                    QUẬN / HUYỆN<span class="text-danger">*</span>
+                                                </label>
+                                                <div>
+                                                       <select id="provinceSelect-@item.Id" asp-for="@Model.DiaChiParam.Huyen_Code" class="form-select ">
+                                                    
+                                                        @{
+                                                        @if (lstHuyen == null || lstHuyen.Count ==0)
+                                                         {
+                                                                        <option value="" selected>Chọn quận huyện</option>
+                                                        }
+                                                        else
+                                                        {
+                                                                        <option value="" >Chọn quận huyện</option>
+                                                            var lstHuyenChon = lstHuyen.Where(x=> x.Code_ThanhPho == item.Province_code).ToList();
+                                                                    foreach (var item1 in lstHuyenChon)
+                                                                    {
+                                                                        if (item1.Code == item.District_code)
+                                                                        {
+                                                                            <option value="@item1.Code" selected>@item1.Name</option>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <option value="@item1.Code">@item1.Name</option>
+                                                                        }
+
+                                                                    }
+                                                        }
+                                                    }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 col-4">
+                                                <label for="" class="form-label fw-bold">
+                                                    PHƯỜNG / XÃ<span class="text-danger">*</span>
+                                                </label>
+                                                <div>
+                                                    <select id="wardSelect-@item.Id" asp-for="@Model.DiaChiParam.Xa_Code" class="form-select">
+                                                        @{
+                                                        @if (lstXa == null || lstXa.Count ==0)
+                                                         {
+                                                                        <option value="" selected>Chọn phường xã</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="" >Chọn phường xã</option>
+                                                            var lstXaChon = lstXa.Where(x=> x.Code_Huyen == item.District_code).ToList();
+                                                                    foreach (var item1 in lstXaChon)
+                                                                    {
+                                                                        if (item1.Code == item.Ward_code)
+                                                                        {
+                                                                            <option value="@item1.Code" selected>@item1.Name</option>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <option value="@item1.Code">@item1.Name</option>
+                                                                        }
+
+                                                                    }
+                                                        }
+                                                    }
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="mb-3 col-12">
+                                            <label for="diaChi-@item.Id" class="form-label fw-bold">
+                                                ĐỊA CHỈ<span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" asp-for="@Model.DiaChiParam.DiaChiChiTiet" value="@item.DiaChiChiTiet" class="form-control" id="diaChi-@item.Id"
+                                                   placeholder="Nhập địa chỉ của bạn" required>
+                                        </div>
+                                        <div class="mb-3 col-12">
+                                            <label for="ghiChu-@item.Id" class="form-label fw-bold">
+                                                GHI CHÚ
+                                            </label>
+                                            <textarea type="text" asp-for="@Model.DiaChiParam.GhiChu" value="@item.GhiChu" class="form-control" id="ghiChu-@item.Id"
+                                                      aria-label="With textarea"
+                                                      placeholder="Nhập ghi chú của bạn"></textarea>
+                                        </div>
+                                        <div class="mb-3 col-12">
+                                            <div class="form-check">
+                                                @if ((bool)item.IsDefault)
+                                                        {
+                                                           <input asp-for="@Model.DiaChiParam.isDefault" class="form-check-input" type="checkbox" id="defaultDC-@item.Id" checked/>  
+                                                        }
+                                                        else
+                                                        {
+                                                            <input asp-for="@Model.DiaChiParam.isDefault" class="form-check-input" type="checkbox" id="defaultDC-@item.Id" />
+                                                        }
+                                           
+                                                <label class="form-check-label ms-2 me-2 text-dark" for="defaultDC-@item.Id">
+                                                    Đặt làm địa chỉ mặc định
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal footer -->
+                            <div class="modal-footer">
+                                <button type="submit" asp-action="ThayDoiThongTinDiaChi" asp-controller="ThanhToan" class="btn btn-danger">
+                                    Lưu thông tin địa chỉ
+                                </button>
+                            </div>
+                
+                        </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+                <script>
+                    document.getElementById("ThanhPho-@item.Id").addEventListener("change", function () {
+                        var selectedThanhPhoCode = this.value;
+
+                        fetch(`https://localhost:7041/api/TaiKhoan/danh-sach-huyen?code=${selectedThanhPhoCode}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const huyenSelect = document.getElementById('provinceSelect-@item.Id');// Thay 'provinceSelect' bằng ID của dropdown huyện
+                                const wardSelect = document.getElementById('wardSelect-@item.Id');
+                                huyenSelect.innerHTML = ''; // Xóa các option cũ
+                                wardSelect.innerHTML = ''; // Xóa các option cũ
+                                const optionH = document.createElement('option');
+                                optionH.value = '';
+                                optionH.textContent = "Chọn quận huyện";
+                                huyenSelect.appendChild(optionH);
+                                const optionX = document.createElement('option');
+                                optionX.textContent = "Chọn phường xã";
+                                wardSelect.appendChild(optionX);
+                                data.forEach(huyen => {
+
+                                    const option = document.createElement('option');
+                                    option.value = huyen.code;
+                                    option.textContent = huyen.name;
+                                    huyenSelect.appendChild(option);
+                                });
+                            });
+                    });
+
+                    document.getElementById("provinceSelect-@item.Id").addEventListener("change", function () {
+                        var selectedHuyenCode = this.value;
+
+                        fetch(`https://localhost:7041/api/TaiKhoan/danh-sach-xa?code=${selectedHuyenCode}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const wardSelect = document.getElementById('wardSelect-@item.Id'); // Thay 'provinceSelect' bằng ID của dropdown huyện
+                                wardSelect.innerHTML = ''; // Xóa các option cũ
+                                const optionX = document.createElement('option-@item.Id');
+                                optionX.value = '';
+                                optionX.textContent = "Chọn phường xã";
+                                wardSelect.appendChild(optionX);
+                                data.forEach(xa => {
+
+                                    const option = document.createElement('option');
+                                    option.value = xa.code;
+                                    option.textContent = xa.name;
+                                    wardSelect.appendChild(option);
+                                });
+                            });
+                    });
+                </script>
+            }
+        }
+    </div>
+</div>
+
+
+
+@* Script chọn xã , phường, thành phố *@
+<script>
+    document.getElementById("ThanhPho").addEventListener("change", function () {
+        var selectedThanhPhoCode = this.value;
+
+        fetch(`https://localhost:7041/api/TaiKhoan/danh-sach-huyen?code=${selectedThanhPhoCode}`)
+            .then(response => response.json())
+            .then(data => {
+                const huyenSelect = document.getElementById('provinceSelect');// Thay 'provinceSelect' bằng ID của dropdown huyện
+                const wardSelect = document.getElementById('wardSelect');
+                huyenSelect.innerHTML = ''; // Xóa các option cũ
+                wardSelect.innerHTML = ''; // Xóa các option cũ
+                const optionH = document.createElement('option');
+                optionH.value = '';
+                optionH.textContent = "Chọn quận huyện";
+                huyenSelect.appendChild(optionH);
+                const optionX = document.createElement('option');
+                optionX.textContent = "Chọn phường xã";
+                wardSelect.appendChild(optionX);
+                data.forEach(huyen => {
+
+                    const option = document.createElement('option');
+                    option.value = huyen.code;
+                    option.textContent = huyen.name;
+                    huyenSelect.appendChild(option);
+                });
+            });
+    });
+
+    document.getElementById("provinceSelect").addEventListener("change", function () {
+        var selectedHuyenCode = this.value;
+
+        fetch(`https://localhost:7041/api/TaiKhoan/danh-sach-xa?code=${selectedHuyenCode}`)
+            .then(response => response.json())
+            .then(data => {
+                const wardSelect = document.getElementById('wardSelect'); // Thay 'provinceSelect' bằng ID của dropdown huyện
+                wardSelect.innerHTML = ''; // Xóa các option cũ
+                const optionX = document.createElement('option');
+                optionX.value = '';
+                optionX.textContent = "Chọn phường xã";
+                wardSelect.appendChild(optionX);
+                data.forEach(xa => {
+
+                    const option = document.createElement('option');
+                    option.value = xa.code;
+                    option.textContent = xa.name;
+                    wardSelect.appendChild(option);
+                });
+            });
+    });
+</script>

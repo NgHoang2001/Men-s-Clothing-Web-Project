@@ -1,0 +1,358 @@
+﻿@{
+    var userInfo = await services.GetUserInfoClient();
+    var lstGioHang = await servicesGioHang.DanhSachSanPhamGioHang();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FrontEnd</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css" >
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" ></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" ></script>
+    <style>
+        body {
+            /* font-family: 'Montserrat'; */
+            color: #333f48;
+            line-height: 1.5;
+            letter-spacing: 0;
+            font-size: 14px;
+        }
+
+        .title {
+            font-weight: 700;
+            font-size: 20px;
+            line-height: 30px;
+            margin: 0;
+        }
+
+        .product-item-name {
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 1.43;
+        }
+
+            .product-item-name:hover {
+                color: #da291c !important;
+            }
+
+        .giaCu {
+            text-decoration: line-through;
+        }
+
+        .dong {
+            text-decoration: underline;
+        }
+
+        a {
+            text-decoration: none;
+            color: black;
+        }
+
+            a.footer-link:hover {
+                color: #da291c;
+            }
+
+        .count {
+            font-weight: 500;
+            font-size: 11px;
+            line-height: 13px;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 4px 8px rgba(16, 24, 40, .1), 0 2px 4px rgba(16, 24, 40, .06);
+            background: #da291c;
+            border-radius: 11px;
+            min-width: 18px;
+            position: absolute;
+            left: 50%;
+            margin-left: 6px;
+            top: 0;
+        }
+
+        .fa-brands {
+            display: block;
+            width: 36px;
+            height: 36px;
+            margin-right: 24px;
+            /* background-position: center;
+            background-repeat: no-repeat; */
+            margin-bottom: 10px;
+            font-size: 22px;
+            line-height: 1.71;
+            font-weight: 400;
+            color: #333f48;
+        }
+
+        /* slide slick */
+        .services-slider {
+            display: flex;
+            max-width: 800px;
+            max-height: 1200px;
+        }
+
+        .nav-container .slick-current img {
+            box-shadow: 0 0 4px 2px rgba(108, 232, 220, 0.9);
+        }
+
+        .slider-main {
+            width: 100%;
+        }
+
+        .main-container {
+            width: 100%;
+        }
+
+        .nav-container img {
+            max-height: 100px;
+        }
+
+        .nav-container .slick-slide {
+            max-height: 135px;
+            margin-bottom: 18px;
+        }
+
+        .services-slider .slick-track {
+            margin-left: 50px;
+        }
+
+        .text-mo {
+            margin: 0 20px;
+        }
+
+        .span-dm {
+            box-sizing: border-box;
+            display: block;
+            overflow: hidden;
+            position: relative;
+            padding: 0px;
+            max-width: 160px !important;
+            width: 160px !important;
+            max-height: 160px !important;
+            height: 160px !important;
+            margin: 0px auto 16px !important;
+        }
+
+        .img-dm {
+            position: absolute;
+            inset: 0px;
+            box-sizing: border-box;
+            padding: 0px;
+            margin: auto;
+            display: block;
+            width: 0px;
+            height: 0px;
+            min-width: 100%;
+            max-width: 100%;
+            min-height: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .text-dm {
+            margin: 0px auto !important;
+            height: fit-content;
+            padding-left: 5%;
+            font-size: 16px;
+            color: rgb(51, 51, 51);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            padding-right: 13%;
+            box-sizing: border-box;
+            font-weight: 500;
+            width: calc(100% + 8px);
+        }
+
+        .scrollable-menu {
+            height: auto;
+            max-height: calc(100vh - 150px);
+            overflow-x: hidden;
+        }
+
+    </style>
+</head>
+<body>
+    <header class="sticky-top shadow">
+        <!-- Thanh điều hướng -->
+        <nav class="navbar navbar-expand-sm bg-light sticky-top shadow">
+
+            <div class="container  ">
+                <!-- Links -->
+                <!-- Phần 1 -->
+                <ul class="  navbar-nav align-items-center d-flex justify-content-around text-center">
+                    <a class="navbar-brand me-5" asp-action="Index" asp-controller="TrangChu"><img src="~/img/logo/logo.svg" style="max-height: 40px;" alt=""></a>
+                    <li class="nav-item me-3">
+                        <a class="nav-link fw-bold" href="#" style="font-size: 20px;min-width: 30px;">NAM</a>
+                    </li>
+                </ul>
+                <!-- Phần 2 -->
+                <ul class="navbar-nav align-items-center d-flex justify-content-around">
+                    <div class="me-3">
+                    <li class=" nav-item input-group input-group-sm">
+                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" class="form-control" placeholder="Tìm kiếm">
+                        <a asp-action="TimKiem" asp-controller="Home" class="btn btn-danger ms-4">Tìm kiếm</a>
+                    </li>
+            </div>
+            <div class="d-flex justify-content-around">
+                <!-- <li class=" nav-item  me-3 text-center">
+                    <a class="nav-link d-flex flex-column" href="#!">
+                        <i class="fa-solid fa-shop"></i>
+                        <span style="min-width: 70px;">Cửa hàng</span>
+                    </a>
+
+                </li> -->
+                <li class=" nav-item me-3 text-center">
+                            @if (userInfo.Id_TaiKhoan == null)
+                            {
+                        <a class="nav-link  d-flex flex-column" asp-action="DangNhap" asp-controller="Authen">
+                            <i class="fa-regular fa-circle-user"></i>
+                            <span style="min-width: 70px;">Đăng nhập</span>
+                                </a>
+                            }
+                            else
+                            {
+                    <a class="nav-link  d-flex flex-column" asp-action="Index" asp-controller="TaiKhoan">
+                        <i class="fa-regular fa-circle-user"></i>
+                        <span style="min-width: 70px;">Tài khoản</span>
+                    </a>
+                            }
+
+                </li>
+                <li class=" nav-item text-center" style="position: relative;">
+                    @if (userInfo.Id_TaiKhoan == null)
+                            {
+                        <a class="nav-link d-flex flex-column " style="position: relative;" asp-action="DanhNhap" asp-controller="Authen" >
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span style="min-width: 70px;">Giỏ hàng</span>
+                            <span class="count">0</span>
+                                </a>
+                            }
+                            else
+                            {
+                        <a class="nav-link d-flex flex-column " style="position: relative;" asp-action="ChiTietGioHang" asp-controller="GioHang" asp-route-id="@userInfo.Id_KhachHang">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span style="min-width: 70px;">Giỏ hàng</span>
+                                    @if(lstGioHang == null)
+                                    {
+                                        <span class="count">0</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="count">@lstGioHang.Select(x=> x.SoLuong).Sum()</span>
+                                    }
+                                </a>
+                            }
+
+                </li>
+            </div>
+            </ul>
+            </div>
+        </nav>
+    </header>
+    <div >
+
+        <main role="main">
+            @RenderBody()
+        </main>
+
+    </div>
+    @* Chan Trang *@
+    <!-- footer -->
+    <footer class="bg-light text-dark text-center text-lg-start ">
+        <hr>
+        <!-- Grid container -->
+        <div class="container p-4">
+            <!--Grid row-->
+            <div class="row">
+                <!--Grid column-->
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">CÔNG TY CỔ PHẦN CANIFA</h5>
+                    <p>
+                        Địa chỉ trụ sở tại số 688 Đường Quang Trung, Phường La Khê, Quận Hà Đông, Thành phố Hà Nội.
+                    </p>
+                    <p>
+                        Địa chỉ liên hệ: P301, tầng 3, tòa nhà GP Invest, số 170 La Thành, Phường Ô Chợ Dừa, Quận Đống
+                        Đa, Thành Phố Hà Nội.
+                    </p>
+                    <p>Điện thoại: +8424 - 7303.0222</p>
+                    <div class="d-flex flex-wrap align-items-center mt-2">
+                        <a href="#!"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#!"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#!"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#!"><i class="fa-brands fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <!--Grid column-->
+                <!--Grid column-->
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">THƯƠNG HIỆU</h5>
+
+                    <ul class="list-unstyled mb-0">
+                        <li class="mt-2 mb-2">
+                            <a href="#" class="footer-link"><span>Giới thiệu</span></a>
+                        </li>
+                        <li class="mt-2 mb-2">
+                            <a href="#" class="footer-link"><span>Tin tức</span></a>
+                        </li>
+                        <li class="mt-2 mb-2">
+                            <a href="#" class="footer-link"><span>Tuyển dụng</span></a>
+                        </li>
+                        <li class="mt-2 mb-2">
+                            <a href="#" class="footer-link"><span>Liên hệ</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <!--Grid column-->
+                <!--Grid column-->
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase mb-0">HỖ TRỢ</h5>
+
+                    <ul class="list-unstyled">
+                        <li class="mt-2 mb-2">
+                            <a href="#" class="footer-link"><span>Hỏi đáp</span></a>
+                        </li>
+                        <li class="mt-2 mb-2">
+                            <a href="#" class="footer-link"><span>Chính sách KHTT</span></a>
+                        </li>
+                        <li class="mt-2 mb-2">
+                            <a href="#" class="footer-link"><span>Kiểm tra đơn hàng</span></a>
+                        </li>
+                        <li class="mt-2 mb-2">
+                            <a href="#" class="footer-link"><span>Chính sách vận chuyển</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <!--Grid column-->
+            </div>
+            <!--Grid row-->
+            <hr>
+            <div class="text-start p-2">
+                © 2023 CANIFA
+                <!-- <a class="text-white" href="https://mdbootstrap.com/">MDBootstrap.com</a> -->
+            </div>
+        </div>
+        <!-- Grid container -->
+        <!-- Copyright -->
+        <!-- Copyright -->
+    </footer>
+
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+

@@ -1,0 +1,11 @@
+﻿@using ServerLibary.Model.Responses
+@{
+    var userinfor = ViewData["currentUserInfo"] as UserInfoResp;
+}
+
+<div>
+    <p>@userinfor?.Id_TaiKhoan</p>
+    <p>@userinfor?.Id_KhachHang</p>
+    <p>@userinfor?.Email</p>
+    @* <p>@userinfor.Id_TaiKhoan</p> *@
+</div>

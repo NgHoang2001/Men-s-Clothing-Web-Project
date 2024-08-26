@@ -1,0 +1,536 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@model ThemSpVaoGioHangParam
+@{
+    var spChiTiet = ViewData["sanPhamChiTiet"] as SanPhamChiTietResp;
+    var lstDanhMucCha = ViewData["danhMucCha"] as List<DanhMucResp>;
+    var userInfor = ViewData["user"] as UserInfoResp;
+    // lstMauSac = new List<MauSacResp>();
+    // var lstKichThuoc = new List<KichThuocResp>();
+
+    var lstMauSac = spChiTiet?.SanPhamChiTiet.Select(x => new
+    {
+        Id = x.MauSac?.Id,
+        Ten = x.MauSac?.Ten,
+        MauSac = x.MauSac?.MauSac
+    }).Distinct().ToList();
+    var   lstKichThuoc = spChiTiet?.SanPhamChiTiet.Select(x =>new
+    {
+        Id = x.KichThuoc?.Id,
+        Ten = x.KichThuoc?.Ten,
+    }).Distinct().ToList();
+         
+    
+}
+
+<div>
+    @if (spChiTiet != null)
+    {
+          <div class="container mt-5 mb-5">
+
+            <div class="d-flex flex-wrap">
+                <a href="TrangChu.html" class="text-mo" style="margin-left: 0;">Trang chủ</a><span>|</span>
+                <a href="#!" class="text-mo">Nam</a><span>|</span>
+                @if(lstDanhMucCha != null && lstDanhMucCha.Any(x=> x.Id == spChiTiet.DanhMuc?.Id_DanhMuc_Cha))
+                {
+                    <a href="#!" class="text-mo">@lstDanhMucCha.First(x=> x.Id == spChiTiet.DanhMuc?.Id_DanhMuc_Cha).Ten</a><span>|</span>
+
+                }
+                <a href="#!" class="text-mo">@spChiTiet.DanhMuc?.Ten</a><span>|</span>
+                <p class="text-mo fw-bold">@spChiTiet.SanPham?.Ten</p>
+            </div>
+        </div>
+
+         <div>
+            <div style="display: flex!important;">
+                <section class="services-slider ">
+                    <div class="main-container ">
+                        <div class="slider slider-main">
+                            @if (spChiTiet?.SanPham?.UrlImg != null)
+                            {
+                               
+                            @foreach (var item in spChiTiet?.SanPham?.UrlImg)
+                            {
+                                if (!item.IsBanner)
+                                {
+                                    <div class="border bg-light  rounded overflow-hidden mb-4">
+                                        <img src=@item.Url class="mw-100 mh-100" width="800" height="1000" alt="">
+                                    </div>
+                                }
+                            }
+
+                            }
+                        </div>
+                    </div>
+                    <div class="nav-container">
+                        <div class="slider-nav" style="max-width: 130px;">
+                            @if (spChiTiet?.SanPham?.UrlImg != null)
+                            {
+                                @foreach (var item in spChiTiet?.SanPham?.UrlImg)
+                                {
+                                    if (!item.IsBanner)
+                                    {
+                                        <div>
+                                            <img src=@item.Url>
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                </section>
+                <div class="" style="margin-left: 160px; width: 500px;">
+                    <h1>@spChiTiet?.SanPham?.Ten</h1>
+
+                    <div class="mt-3">
+                         <span style="font-size: 18px;" class="fw-bold">@spChiTiet?.SanPham?.DonGia đ</span>  
+                    </div>
+                     <form asp-action="ThemSpVaoGioHang" asp-controller="TrangChu" method="post">
+                    <div class="mt-3">
+                       
+                         <input type="text" asp-for="@Model.Id_SP" value="@spChiTiet?.SanPham?.Id" hidden />
+                        
+                        <div style="margin-bottom: 12px;">
+                            <span class="fw-bold">Màu sắc: </span>
+                        </div>
+
+                        <div class="d-flex ">
+                            <div class="d-flex flex-wrap">
+                                @{
+                                    int i = 0;
+                                    if (lstMauSac != null || lstMauSac?.Count > 0)
+                                    {
+                                        foreach (var item in lstMauSac)
+                                        {
+                                            if (i == 0)
+                                            {
+                                                <div class="me-2">
+                                                    <input type="radio"  asp-for="@Model.Id_MS" value="@item.Id" class="btn-check"  id="mauSac-@i"
+                                                           autocomplete="off" checked>
+                                                    <label class="btn" for="mauSac-@i">
+                                                        <img width="30px" height="30px" src=@item.MauSac class="rounded-circle">
+                                                    </label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="me-2">
+                                                   <input type="radio" asp-for="@Model.Id_MS" value="@item.Id" class="btn-check"  id="mauSac-@i"
+                                                           autocomplete="off">
+                                                    <label class="btn" for="mauSac-@i">
+                                                        <img width="30px" height="30px" src=@item.MauSac class="rounded-circle">
+                                                    </label>
+                                                </div>
+                                            }
+                                            i++;
+                                        }
+                                    }
+                                    
+                                }
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="mt-3" style="width: 100%;">
+                        <div>
+                            <div style="margin-bottom: 12px;">
+                                <span class="fw-bold">Kích thước: </span>
+                            </div>
+                            <div class="d-flex flex-wrap">
+                                @{
+                                    i = 0;
+                                    if (lstKichThuoc != null || lstKichThuoc?.Count > 0)
+                                    {
+                                        foreach (var item in lstKichThuoc)
+                                    {
+                                        if (i == 0)
+                                        {
+                                            <div class="me-2">
+                                                <input type="radio" asp-for="@Model.Id_KT" value="@item.Id" class="btn-check"   id="kichThuoc-@i"
+                                                    autocomplete="off" checked>
+                                                <label class="btn" for="kichThuoc-@i">@item.Ten</label>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            
+                                        <div class="me-2">
+                                                <input type="radio"  asp-for="@Model.Id_KT"  value="@item.Id"  class="btn-check"   id="kichThuoc-@i"
+                                                    autocomplete="off">
+                                                <label class="btn" for="kichThuoc-@i">@item.Ten</label>
+                                        </div>
+                                        }
+                                        i++;
+                                    }
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                   @*  <div class="mt-3 d-flex justify-content-between">
+                        <div>
+                            <p class="fw-bold">Số lượng: </p>
+                        </div>
+                        <div data-mdb-input-init class="form-outline">
+                            <input value="1" type="number" class="form-control" />
+                        </div>
+                    </div> *@
+                    <div class="mt-3" style="width: 100%;margin-bottom: 20px;">
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" asp-action="ThemSpVaoGioHang" class="btn btn-light text-danger w-100 me-2 border-1 border-danger"
+                                style="font-size: 18px; padding: 13px;">
+                                <span class="me-2"><i class="fa-solid fa-cart-shopping"></i></span>Thêm vào giỏ</button>
+                            <button type="submit"  asp-action="MuaNgaySp" class="btn btn-danger text-light w-100 border-1 border-danger"
+                                style="font-size: 18px; padding: 13px;">
+                                <span class="me-2"><i class="fa-solid fa-cart-shopping"></i></span>Mua ngay</button>
+                        </div>
+                    </div>
+                    </form>
+
+                    <div class="bg-light" style=" width: 100%;margin-bottom: 16px;border: 1px solid;">
+                        <div style=" width: 100%;padding: 20px;">
+                            <p>
+                                <a class="text-decoration-none" style="width: 100%;font-size: 20px;"
+                                    data-bs-toggle="collapse" href="#collapseExample1" role="button"
+                                    aria-expanded="false" aria-controls="collapseExample1">
+                                    Mô tả
+                                </a>
+                            </p>
+                            <div class="collapse" id="collapseExample1">
+                                <div class="card card-body">
+                                   @spChiTiet?.SanPham?.MoTa
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-light" style=" width: 100%;margin-bottom: 16px;border: 1px solid;">
+                        <div style=" width: 100%;padding: 20px;">
+                            <p>
+                                <a class="text-decoration-none" style="width: 100%;font-size: 20px;"
+                                    data-bs-toggle="collapse" href="#collapseExample2" role="button"
+                                    aria-expanded="false" aria-controls="collapseExample2">
+                                    Chất liệu
+                                </a>
+                            </p>
+                            <div class="collapse" id="collapseExample2">
+                                <div class="card card-body">
+                                    @spChiTiet?.SanPham?.ChatLieu
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-light" style=" width: 100%;margin-bottom: 16px;border: 1px solid;">
+                        <div style=" width: 100%;padding: 20px;">
+                            <p>
+                                <a class="text-decoration-none" style="width: 100%; font-size: 20px;"
+                                    data-bs-toggle="collapse" href="#collapseExample3" role="button"
+                                    aria-expanded="false" aria-controls="collapseExample3">
+                                    Hướng dẫn sử dụng
+                                </a>
+                            </p>
+                            <div class="collapse" id="collapseExample3">
+                                <div class="card card-body">
+                                    @spChiTiet?.SanPham?.HuongDanSuDung
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        
+        <div class="container mt-5 mb-5">
+
+            <!-- duong dan den trang -->
+            <div class="d-flex flex-wrap">
+                <a href="TrangChu.html" class="text-mo" style="margin-left: 0;">Trang chủ</a><span>|</span>
+                <a href="#!" class="text-mo">Nam</a><span>|</span>
+                <a href="#!" class="text-mo">Hàng mới</a><span>|</span>
+                <a href="#!" class="text-mo">Mặc trên</a><span>|</span>
+                <p class="text-mo fw-bold">Áo phông dài tay nữ phối kim tuyến</p>
+            </div>
+        </div>
+
+        <div>
+            <div style="display: flex!important;">
+                <section class="services-slider ">
+                    <div class="main-container ">
+                        <div class="slider slider-main">
+                            <div class="border bg-light  rounded overflow-hidden mb-4">
+                                <img src="~/img/detail/san_pham_1.png" class="mw-100 mh-100" width="800" height="1000"
+                                    alt="">
+                            </div>
+                            <div class="border bg-light  rounded overflow-hidden mb-4">
+                                <img src="~/img/detail/san_pham_2.png" class="mw-100 mh-100" width="800" height="1000"
+                                    alt="">
+                            </div>
+                            <div class="border bg-light  rounded overflow-hidden mb-4">
+                                <img src="~/img/detail/san_pham_3.png" class="mw-100 mh-100" width="800" height="1000"
+                                    alt="">
+                            </div>
+                            <div class="border bg-light  rounded overflow-hidden mb-4">
+                                <img src="~/img/detail/san_pham_4.png" class="mw-100 mh-100" width="800" height="1000"
+                                    alt="">
+                            </div>
+                            <div class="border bg-light  rounded overflow-hidden mb-4">
+                                <img src="~/img/detail/san_pham_5.png" class="mw-100 mh-100" width="800" height="1000"
+                                    alt="">
+                            </div>
+                            <div class="border bg-light  rounded overflow-hidden mb-4">
+                                <img src="~/img/detail/san_pham_6.png" class="mw-100 mh-100" width="800" height="1000"
+                                    alt="">
+                            </div>
+                            <div class="border bg-light  rounded overflow-hidden mb-4">
+                                <img src="~/img/detail/san_pham_7.png" class="mw-100 mh-100" width="800" height="1000"
+                                    alt="">
+                            </div>
+                            <div class="border bg-light  rounded overflow-hidden mb-4">
+                                <img src="~/img/detail/san_pham_8.png" class="mw-100 mh-100" width="800" height="1000"
+                                    alt="">
+                            </div>
+                            <div class="border bg-light  rounded overflow-hidden mb-4">
+                                <img src="~/img/detail/san_pham_9.png" class="mw-100 mh-100" width="800" height="1000"
+                                    alt="">
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="nav-container">
+                        <div class="slider-nav" style="max-width: 130px;">
+                            <div>
+                                <img src="~/img/detail/san_pham_1.png">
+                            </div>
+                            <div>
+                                <img src="~/img/detail/san_pham_2.png">
+                            </div>
+                            <div>
+                                <img src="~/img/detail/san_pham_3.png">
+                            </div>
+                            <div>
+                                <img src="~/img/detail/san_pham_4.png">
+                            </div>
+                            <div>
+                                <img src="~/img/detail/san_pham_5.png">
+                            </div>
+                            <div>
+                                <img src="~/img/detail/san_pham_6.png">
+                            </div>
+                            <div>
+                                <img src="~/img/detail/san_pham_7.png">
+                            </div>
+                            <div>
+                                <img src="~/img/detail/san_pham_8.png">
+                            </div>
+                            <div>
+                                <img src="~/img/detail/san_pham_9.png">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="" style="margin-left: 160px; width: 500px;">
+                    <h1>Áo phông dài tay nữ phối kim tuyến
+                    </h1>
+                    @* <span>Mã sp: 6TL23W002</span> *@
+                    <div class="mt-3">
+                        <span style="font-size: 18px;" class="fw-bold">239.200 ₫</span>
+                        <br>
+                        <span class="opacity-50" style="text-decoration: line-through;font-size: 15px;">299.000 ₫</span>
+                        <span class="text-danger">-20%</span>
+                    </div>
+                    <div class="mt-3">
+                        <div style="margin-bottom: 12px;">
+                            <span class="fw-bold">Màu sắc: </span><span>Đỏ
+                                đậm</span>
+                        </div>
+                        <!-- Màu sắc -->
+                        <div class="d-flex ">
+                            <div class="d-flex flex-wrap">
+                                <div class="me-2">
+                                    <input type="radio" class="btn-check" name="options-base-1" id="option1"
+                                        autocomplete="off" checked>
+                                    <label class="btn" for="option1">
+                                        <img width="30px" height="30px" src="~/img/color/mau1.png"
+                                            class="rounded-circle"></label>
+                                </div>
+                                <div class="me-2">
+                                    <input type="radio" class="btn-check" name="options-base-1" id="option2"
+                                        autocomplete="off">
+                                    <label class="btn" for="option2">
+                                        <img width="30px" height="30px" src="~/img/color/mau2.png"
+                                            class="rounded-circle"></label>
+                                </div>
+                                <div class="me-2">
+                                    <input type="radio" class="btn-check" name="options-base-1" id="option3"
+                                        autocomplete="off">
+                                    <label class="btn" for="option3">
+                                        <img width="30px" height="30px" src="~/img/color/mau3.png"
+                                            class="rounded-circle"></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="mt-3" style="width: 100%;">
+                        <div>
+                            <div style="margin-bottom: 12px;">
+                                <span class="fw-bold">Kích thước:
+                                </span> <span>Size
+                                    M</span>
+                            </div>
+                            <div class="d-flex flex-wrap">
+                                <div class="me-2">
+                                    <input type="radio" class="btn-check" name="options-base" id="option5"
+                                        autocomplete="off" checked>
+                                    <label class="btn" for="option5">Size
+                                        M</label>
+                                </div>
+                                <div class="me-2">
+                                    <input type="radio" class="btn-check" name="options-base" id="option6"
+                                        autocomplete="off">
+                                    <label class="btn" for="option6">Size
+                                        L</label>
+                                </div>
+                                <div class="me-2">
+                                    <input type="radio" class="btn-check" name="options-base" id="option7"
+                                        autocomplete="off">
+                                    <label class="btn" for="option7">Size
+                                        S</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex justify-content-between">
+                        <div>
+                            <p class="fw-bold">Số lượng: </p>
+                        </div>
+                       
+                        <div data-mdb-input-init class="form-outline">
+                            <input value="1" type="number" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="mt-3" style="width: 100%;margin-bottom: 20px;">
+                        <div class="d-flex justify-content-between">
+                            <a href="#" class="btn btn-light text-danger w-100 me-2 border-1 border-danger"
+                                style="font-size: 18px; padding: 13px;">
+                                <span class="me-2"><i class="fa-solid fa-cart-shopping"></i></span>Thêm vào giỏ</a>
+                            <a href="#" class="btn btn-danger text-light w-100 border-1 border-danger"
+                                style="font-size: 18px; padding: 13px;">
+                                <span class="me-2"><i class="fa-solid fa-cart-shopping"></i></span>Mua ngay</a>
+                        </div>
+
+                    </div>
+                    <!-- khối collapse -->
+
+                    <div class="bg-light" style=" width: 100%;margin-bottom: 16px;border: 1px solid;">
+                        <div style=" width: 100%;padding: 20px;">
+                            <p>
+                                <a class="text-decoration-none" style="width: 100%;font-size: 20px;"
+                                    data-bs-toggle="collapse" href="#collapseExample1" role="button"
+                                    aria-expanded="false" aria-controls="collapseExample1">
+                                    Mô tả
+                                </a>
+                            </p>
+                            <div class="collapse" id="collapseExample1">
+                                <div class="card card-body">
+                                    Áo nữ cổ tròn dài tay với các chi tiết tạo gân ở thân áo và sống tay kết hợp với
+                                    chất
+                                    liệu
+                                    vải mỏng, mềm mix kim tuyến đã tạo nên 1 sản phẩm basic nhưng ấn tượng, phù hợp với
+                                    nhiều
+                                    hoàn cảnh mặc hàng ngày hay mùa lễ hội. <br>
+                                    Cấu trúc dệt sợi lỏng và kết hợp với sợi kim tuyến tạo nên sự quyến rũ cho sản phẩm.
+                                    <br>
+                                    Thành phần chính là sợi Rayon mix với sợi poly tạo nên sự thoải mái, mềm mại và giữ
+                                    phom
+                                    sau
+                                    nhiều lần sử dụng.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-light" style=" width: 100%;margin-bottom: 16px;border: 1px solid;">
+                        <div style=" width: 100%;padding: 20px;">
+                            <p>
+                                <a class="text-decoration-none" style="width: 100%;font-size: 20px;"
+                                    data-bs-toggle="collapse" href="#collapseExample2" role="button"
+                                    aria-expanded="false" aria-controls="collapseExample2">
+                                    Chất liệu
+                                </a>
+                            </p>
+                            <div class="collapse" id="collapseExample2">
+                                <div class="card card-body">
+                                    80% rayon 20% polyester
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-light" style=" width: 100%;margin-bottom: 16px;border: 1px solid;">
+                        <div style=" width: 100%;padding: 20px;">
+                            <p>
+                                <a class="text-decoration-none" style="width: 100%; font-size: 20px;"
+                                    data-bs-toggle="collapse" href="#collapseExample3" role="button"
+                                    aria-expanded="false" aria-controls="collapseExample3">
+                                    Hướng dẫn sử dụng
+                                </a>
+                            </p>
+                            <div class="collapse" id="collapseExample3">
+                                <div class="card card-body">
+                                    Giặt máy ở chế độ nhẹ, nhiệt độ thường. <br>
+                                    Không sử dụng hóa chất tẩy có chứa Clo. <br>
+                                    Phơi vắt ngang, trong bóng mát. <br>
+                                    Sấy thùng, mức nhiệt độ trung bình. <br>
+                                    Là ở nhiệt độ thấp 110 độ C. <br>
+                                    Giặt mặt trái sản phẩm. <br>
+                                    Giặt với sản phẩm cùng màu. <br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    </div>
+
+
+    <script def>
+        function myFunction() {
+             console.log("a");
+}
+        $('.slider-main').slick({
+            slidesToShow: 1,
+            arrows: false,
+            asNavFor: '.slider-nav',
+            vertical: true,
+            autoplay: false,
+            verticalSwiping: true,
+        });
+
+        $('.slider-nav').slick({
+            slidesToShow: 4,
+            asNavFor: '.slider-main',
+            vertical: true,
+            focusOnSelect: true,
+            autoplay: false,
+            arrows: false,
+            autoplaySpeed: 3000,
+        });
+
+        $(window).on('resize orientationchange', function () {
+            if ($(window).width() > 1200) {
+                $('.slider-nav').slick('unslick');
+                $('.slider-nav').slick({
+                    slidesToShow: 4,
+                    asNavFor: '.slider-main',
+                    vertical: true,
+                    focusOnSelect: true,
+                    autoplay: false,
+                    centerMode: true
+                });
+            }
+        });
+    </script>
+

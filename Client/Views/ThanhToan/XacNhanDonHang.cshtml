@@ -1,0 +1,151 @@
+﻿@model ThanhToanSubmit;
+
+@{
+    var lstDiaChi = ViewData["lstDiaChi"] as List<DiaChiDatHangClientResp>;
+    var lstSpGioHang = ViewData["lstGioHang"] as List<SanPhamGioHangResp>;
+    var lstThanhPho = ViewData["dsThanhPho"] as List<ThanhPhoResp>;
+    var viewData = new ViewDataDictionary(ViewData);
+    viewData["lstDiaChi"] = lstDiaChi;
+    viewData["dsThanhPho"] = lstThanhPho;
+    lstSpGioHang = lstSpGioHang?.Where(x => x.IsChon).ToList();
+    var diaChiChon = lstDiaChi?.FirstOrDefault(x => x.IsChon);
+    int sumSp = lstSpGioHang?.Select(x=> x.SoLuong).Sum() ?? 0;
+    decimal? tongThanhToan = lstSpGioHang?.Select(x =>x.SoLuong * x.SanPham.DonGia).ToList().Sum() ?? 0;
+}
+
+<form asp-action="ThanhToanSanPham" asp-controller="ThanhToan" method="post">
+<div class="container mb-5 mt-5">
+   <input asp-for="@Model.Id_DiaChi" value="@diaChiChon?.Id" hidden/>
+    <div class="row">
+        <div class="col-12 row">
+            <div class="col-8">
+                <div>
+                @Html.Partial("DiaChiPartial", null, (ViewDataDictionary)viewData)
+
+                </div>
+            <!--  -->
+            <div class="border border-1 p-3">
+                <div class="mb-2 mt-3">
+                    <label class="form-label">Phương thức thanh toán</label>
+                    <div class="d-flex flex-column">
+                        <div class="form-check ">
+                            <input class="form-check-input" type="radio" name="flexRadio" id="flexRadio1" checked>
+                            <label class="form-check-label" for="flexRadio1">
+                                Thanh toán khi nhận hàng (COD)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Sản phẩm -->
+            <div class="border border-1 p-4 mt-5">
+                <div class="mb-5 mt-3">
+                    <div class="mb-4">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <label class="form-label ms-3 fw-bold">Sản phẩm (@sumSp)</label>
+                    </div>
+                    @if (lstSpGioHang != null && lstSpGioHang.Count > 0)
+                        {
+                            foreach (var sp in lstSpGioHang)
+                            {
+                             @if (!sp.IsChon)
+                                {
+                                    continue; 
+                                }
+                            <div class="row pb-3 mb-4 border-bottom">
+                                <div class="col-6">
+                                    <div class="d-flex">
+                                        <div style=" margin-right: 60px; width: 100px; min-width: 100px;">
+                                            <img src="@sp.SanPhamChiTiet?.HinhAnhResp?.Url" class="mw-100 mh-100" alt="">
+                                        </div>
+                                        <div>
+                                            <p>@sp.SanPham?.Ten</p>
+                                            <div class="d-flex">
+                                                <div class="bage" style="margin-right: 20px;">
+                                                     <img  src="@sp.SanPhamChiTiet?.MauSac?.MauSac" class="rounded-circle" />
+                                                </div>
+                                                <span>|</span>
+                                                <p style="margin: 0 20px;">@sp?.SanPhamChiTiet?.KichThuoc?.Ten</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-2">
+                                        <span class="fw-bold">@(sp?.SanPham?.DonGia ?? 0) <span class="dong">đ</span> </span>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-2">
+                                        <span class="">Số lượng : <span>@(sp?.SoLuong ?? 0) </span> </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            }
+                        }
+                        else
+                        {
+                            <div class="row pb-3 mb-4 border-bottom">
+                                <div class="col-6">
+                                    <div class="d-flex justify-content-between">
+                                        <div style=" margin-right: 20px; width: 74px; min-width: 74px;">
+                                            <img src="./img/detail/san_pham_4.png" class="mw-100 mh-100" alt="">
+                                        </div>
+                                        <div>
+                                            <p>Áo phông dài tay nữ phối kim tuyến</p>
+                                            <div class="d-flex">
+                                                <div class="bage"
+                                                     style="background-image: url(/img/mau3.png); margin-right: 20px;">
+                                                </div>
+                                                <span>|</span>
+                                                <p style="margin: 0 20px;">S</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-2">
+                                        <span class="fw-bold">279.000 <span class="dong">đ</span> </span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="giaCu">399.000 <span class="dong">đ</span></span>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-2">
+                                        <span class="">Số lượng : <span>1</span> </span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="col-4">
+                <div class="border p-4 ">
+                    <div class="mb-2 ">
+                        <div class=" mb-4 pb-2 ">
+                            <div class="d-flex justify-content-between">
+                                <div class="">
+                                    <h4 class="form-label fw-bold">Tổng thanh toán</h4>
+                                    <p style="font-size: 12px;">(Đã bao gồm thuế VAT)</p>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="fw-bold">@tongThanhToan <span class="dong">đ</span></span>
+                                </div>
+                            </div>
+                            <div class="w-100">
+                                <button type="submit" asp-action="ThanhToanSanPham" asp-controller="ThanhToan" class="btn btn-danger w-100 mw-100 mh-100">
+                                    Thanh Toán
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+</form>

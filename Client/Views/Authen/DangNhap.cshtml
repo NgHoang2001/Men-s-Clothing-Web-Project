@@ -1,0 +1,19 @@
+﻿@model BaseLibary.DTOs.Login
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+<div class="container d-flex align-items-center justify-content-center pt-5">
+    <form asp-action="dangnhap" method="post">
+        <div class=" row border p-3 bg-light" style="min-height: 450px; width: 400px;">
+            <h2>Đăng nhập</h2>
+            <input type="text" asp-for="Email" style="height: 8vh;font-size: 20px;" placeholder="Email">
+            <input type="password" asp-for="Password" style="height: 8vh;font-size: 20px;" placeholder="Nhập mật khẩu" minlength="6">
+            <input asp-action="dangnhap" value="Đăng nhập" type="submit" asp-controller="Authen" class="btn btn-danger align-items-center" style="height: 44px;font-size: 20px;">
+            <hr class="d-block">
+            <span class="d-flex justify-content-end">
+                Bạn chưa có tài khoản? <a asp-action="dangky" asp-controller="Authen"
+                                          class="text-danger ms-2 text-decoration-none">Đăng ký</a>
+            </span>
+        </div>
+    </form>
+</div>

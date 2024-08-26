@@ -1,0 +1,105 @@
+﻿@model TestModel;
+@{
+    var type = ViewData["Type"] as string;
+    string[] provincesa = ["Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Hải Phòng"];
+    var lstThanhPho = ViewData["dsThanhPho"] as List<ThanhPhoResp>;
+    var viewData = new ViewDataDictionary(ViewData);
+    viewData["aa"] = lstThanhPho;
+}
+<div>Test Sử dụng Partial View</div>
+<form asp-action="TestModel" asp-controller="Test" method="post">
+
+    @* @if (type == null)
+    {
+
+    }
+    else
+    if (type.Equals("paratial1"))
+    { *@
+    @Html.Partial("paratial1", Model)
+    }
+    @* else
+    if (type.Equals("paratial2"))
+    { *@
+    @Html.Partial("paratial2", Model)
+    @* } *@
+    @* @Html.Partial("paratial"); *@
+    <button type="submit" class="btn btn-primary" asp-action="TestModel">Test</button>
+</form>
+@* <a class="btn btn-danger" asp-action="GetParatial1" asp-controller="Test">Goi paratial 1</a>
+<a class="btn btn-primary" asp-action="GetParatial2" asp-controller="Test">Goi paratial 2</a> *@
+
+
+<div class="d-flex">
+
+    <select id="ThanhPho" class="form-select" aria-label="Default select example">
+        <option selected>Thành phố</option>
+       @{
+            foreach (var item in lstThanhPho)
+            {
+                <option value="@item.Code">@item.Name</option>
+            }
+            
+       }
+    </select>
+    <select id="provinceSelect" class="form-select">
+        <option selected>Huyện</option>
+    </select>
+    <select id="wardSelect" class="form-select">
+        <option selected>Xã</option>
+    </select>
+
+   
+</div>
+<script>
+    document.getElementById("ThanhPho").addEventListener("change", function () {
+        var selectedThanhPhoCode = this.value;
+        
+        fetch(`https://localhost:7041/api/TaiKhoan/danh-sach-huyen?code=${selectedThanhPhoCode}`)
+            .then(response => response.json())
+            .then(data => {
+                const huyenSelect = document.getElementById('provinceSelect');// Thay 'provinceSelect' bằng ID của dropdown huyện
+                const wardSelect = document.getElementById('wardSelect');
+                huyenSelect.innerHTML = ''; // Xóa các option cũ
+                wardSelect.innerHTML = ''; // Xóa các option cũ
+                const optionH = document.createElement('option');
+                optionH.value = '';
+                optionH.textContent = "Huyện";
+                huyenSelect.appendChild(optionH);
+                const optionX = document.createElement('option');
+                optionX.textContent = "Xã";
+                wardSelect.appendChild(optionX);
+                data.forEach(huyen => {
+                    
+                    const option = document.createElement('option');
+                    option.value = huyen.code;
+                    option.textContent = huyen.name;
+                    huyenSelect.appendChild(option);
+                });
+            });
+    });
+
+    document.getElementById("provinceSelect").addEventListener("change", function () {
+        var selectedHuyenCode = this.value;
+        
+        fetch(`https://localhost:7041/api/TaiKhoan/danh-sach-xa?code=${selectedHuyenCode}`)
+            .then(response => response.json())
+            .then(data => {
+                const wardSelect = document.getElementById('wardSelect'); // Thay 'provinceSelect' bằng ID của dropdown huyện
+                wardSelect.innerHTML = ''; // Xóa các option cũ
+                const optionX = document.createElement('option');
+                optionX.value = '';
+                optionX.textContent = "Xã";
+                wardSelect.appendChild(optionX);
+                data.forEach(xa => {
+                    
+                    const option = document.createElement('option');
+                    option.value = xa.code;
+                    option.textContent = xa.name;
+                    wardSelect.appendChild(option);
+                });
+            });
+    });
+</script>
+
+
